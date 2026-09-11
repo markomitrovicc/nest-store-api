@@ -52,3 +52,65 @@ Content-Type: application/json
 
 ### Optional: get products with pagination only
 GET {{baseUrl}}/products?page=1&limit=2
+
+### User registration
+POST {{baseUrl}}/users/register
+Content-Type: application/json
+
+{
+  "firstName": "Marko",
+  "lastName": "Markovic",
+  "email": "marko@example.com",
+  "password": "password123"
+}
+
+### User login
+POST {{baseUrl}}/users/login
+Content-Type: application/json
+
+{
+  "email": "marko@example.com",
+  "password": "password123"
+}
+
+### User login with wrong password
+POST {{baseUrl}}/users/login
+Content-Type: application/json
+
+{
+  "email": "marko@example.com",
+  "password": "wrong-password"
+}
+
+### Duplicate registration
+POST {{baseUrl}}/users/register
+Content-Type: application/json
+
+{
+  "firstName": "Marko",
+  "lastName": "Markovic",
+  "email": "marko@example.com",
+  "password": "password123"
+}
+
+### Registration with invalid email
+POST {{baseUrl}}/users/register
+Content-Type: application/json
+
+{
+  "firstName": "Marko",
+  "lastName": "Markovic",
+  "email": "not-an-email",
+  "password": "password123"
+}
+
+### Registration with short password
+POST {{baseUrl}}/users/register
+Content-Type: application/json
+
+{
+  "firstName": "Marko",
+  "lastName": "Markovic",
+  "email": "newuser@example.com",
+  "password": "123"
+}
