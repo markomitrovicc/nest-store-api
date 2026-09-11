@@ -1,0 +1,54 @@
+@baseUrl = http://localhost:3000
+
+### Get all products
+GET {{baseUrl}}/products
+
+### Search and filter products
+GET {{baseUrl}}/products?search=iphone&category=electronics&brand=Apple&minPrice=500&maxPrice=1500&page=1&limit=10
+
+### Create a product
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "iPhone 15",
+  "description": "Apple smartphone with 128GB storage",
+  "price": 999.99,
+  "category": "electronics",
+  "imageUrl": "https://example.com/iphone15.jpg",
+  "stock": 25,
+  "brand": "Apple"
+}
+
+### Get one product by id
+GET {{baseUrl}}/products/<product-id>
+
+### Update a product by id
+PATCH {{baseUrl}}/products/<product-id>
+Content-Type: application/json
+
+{
+  "price": 949.99,
+  "stock": 15,
+  "brand": "Apple Inc."
+}
+
+### Delete a product by id
+DELETE {{baseUrl}}/products/<product-id>
+
+### Optional: create another product
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "name": "Samsung Galaxy S24",
+  "description": "Android smartphone with AMOLED display",
+  "price": 799.99,
+  "category": "electronics",
+  "imageUrl": "https://example.com/s24.jpg",
+  "stock": 18,
+  "brand": "Samsung"
+}
+
+### Optional: get products with pagination only
+GET {{baseUrl}}/products?page=1&limit=2
