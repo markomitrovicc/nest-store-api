@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { AuthModule } from '@thallesp/nestjs-better-auth';
+import { createAuth } from './auth/auth';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
@@ -26,6 +28,13 @@ import { UsersModule } from './users/users.module';
 
         return { uri: mongoMemoryServer.getUri() };
       },
+    }),
+    AuthModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        auth: await createAuth(configService.get<string>('MONGODB_URI')),
+      }),
     }),
     ProductsModule,
     UsersModule,

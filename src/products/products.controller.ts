@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -33,14 +34,20 @@ export class ProductsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new product' })
-  @ApiCreatedResponse({ description: 'Product created successfully', type: Product })
+  @ApiCreatedResponse({
+    description: 'Product created successfully',
+    type: Product,
+  })
   @ApiBadRequestResponse({ description: 'Invalid product payload' })
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
 
+  @AllowAnonymous()
   @Get()
-  @ApiOperation({ summary: 'Get all products with search, filtering, and pagination' })
+  @ApiOperation({
+    summary: 'Get all products with search, filtering, and pagination',
+  })
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'category', required: false, type: String })
   @ApiQuery({ name: 'brand', required: false, type: String })
@@ -53,6 +60,7 @@ export class ProductsController {
     return this.productsService.findAll(query);
   }
 
+  @AllowAnonymous()
   @Get(':id')
   @ApiOperation({ summary: 'Get a product by id' })
   @ApiParam({ name: 'id', description: 'MongoDB ObjectId of the product' })
@@ -66,8 +74,14 @@ export class ProductsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a product by id' })
   @ApiParam({ name: 'id', description: 'MongoDB ObjectId of the product' })
-  @ApiResponse({ status: 200, description: 'Product updated successfully', type: Product })
-  @ApiBadRequestResponse({ description: 'Invalid product id or invalid update payload' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product updated successfully',
+    type: Product,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid product id or invalid update payload',
+  })
   @ApiNotFoundResponse({ description: 'Product not found' })
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productsService.update(id, updateProductDto);
