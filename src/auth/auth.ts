@@ -6,6 +6,14 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 export async function createAuth(mongoUri?: string) {
   const resolvedMongoUri = mongoUri || process.env.MONGODB_URI;
 
+  const secret = process.env.BETTER_AUTH_SECRET;
+
+  if (!secret) {
+    throw new Error(
+      'BETTER_AUTH_SECRET is required. Set it in your .env file before starting the app.',
+    );
+  }
+
   const effectiveMongoUri =
     resolvedMongoUri || (await MongoMemoryServer.create()).getUri();
 
@@ -31,7 +39,7 @@ export async function createAuth(mongoUri?: string) {
     emailAndPassword: {
       enabled: true,
     },
-    secret: process.env.BETTER_AUTH_SECRET || 'change-me-super-secret-key',
+    secret,
     baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
     basePath: '/api/auth',
     trustedOrigins: [

@@ -1,12 +1,15 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bodyParser: false,
   });
+
+  app.use(helmet());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -16,11 +19,10 @@ async function bootstrap() {
     }),
   );
 
+  const frontendOrigin = process.env.FRONTEND_URL || 'http://localhost:4200';
+
   app.enableCors({
-    origin: [
-      process.env.FRONTEND_URL || 'http://localhost:4200',
-      process.env.BETTER_AUTH_URL || 'http://localhost:3000',
-    ],
+    origin: frontendOrigin,
     credentials: true,
   });
 
