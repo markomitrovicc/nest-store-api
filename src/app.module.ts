@@ -6,6 +6,8 @@ import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { createAuth } from './auth/auth';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CartModule } from './cart/cart.module';
+import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 
@@ -37,6 +39,8 @@ import { UsersModule } from './users/users.module';
       }),
     }),
     ProductsModule,
+    CartModule,
+    OrdersModule,
     UsersModule,
   ],
   controllers: [AppController],
