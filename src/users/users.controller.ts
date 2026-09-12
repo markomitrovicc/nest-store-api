@@ -6,6 +6,8 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
+  private readonly adminUserId = '6aa4ab58e2368e600b79c460';
+
   @Get('me')
   @ApiOperation({ summary: 'Get the current authenticated user' })
   @ApiResponse({
@@ -20,17 +22,21 @@ export class UsersController {
             id: { type: 'string', example: 'user_123' },
             name: { type: 'string', example: 'Marko Markovic' },
             email: { type: 'string', example: 'marko@example.com' },
+            isAdmin: { type: 'boolean', example: true },
           },
         },
       },
     },
   })
   getMe(@Session() session: UserSession) {
+    const isAdmin = session.user.id === this.adminUserId;
+
     return {
       user: {
         id: session.user.id,
         name: session.user.name,
         email: session.user.email,
+        isAdmin,
       },
     };
   }
