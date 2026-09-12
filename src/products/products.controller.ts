@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Patch,
@@ -10,7 +11,8 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
+import { AllowAnonymous, Session } from '@thallesp/nestjs-better-auth';
+import type { UserSession } from '@thallesp/nestjs-better-auth';
 import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
@@ -30,6 +32,8 @@ import { ProductsService } from './products.service';
 @ApiTags('Products')
 @Controller('products')
 export class ProductsController {
+  private readonly adminUserId = '6aa4ab58e2368e600b79c460';
+
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
@@ -39,7 +43,12 @@ export class ProductsController {
     type: Product,
   })
   @ApiBadRequestResponse({ description: 'Invalid product payload' })
-  create(@Body() createProductDto: CreateProductDto) {
+  create(
+    @Session() session: UserSession,
+    @Body() createProductDto: CreateProductDto,
+  ) {
+    this.requireAdmin(session);
+
     return this.productsService.create(createProductDto);
   }
 
@@ -83,7 +92,13 @@ export class ProductsController {
     description: 'Invalid product id or invalid update payload',
   })
   @ApiNotFoundResponse({ description: 'Product not found' })
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+  update(
+    @Session() session: UserSession,
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    this.requireAdmin(session);
+
     return this.productsService.update(id, updateProductDto);
   }
 
@@ -94,7 +109,18 @@ export class ProductsController {
   @ApiResponse({ status: 204, description: 'Product deleted successfully' })
   @ApiBadRequestResponse({ description: 'Invalid product id' })
   @ApiNotFoundResponse({ description: 'Product not found' })
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(
+    @Session() session: UserSession,
+    @Param('id') id: string,
+  ): Promise<void> {
+    this.requireAdmin(session);
+
     await this.productsService.remove(id);
+  }
+
+  private requireAdmin(session: UserSession): void {
+    if (session.user.id !== this.adminUserId) {
+      throw new ForbiddenException('Only admin can manage products');
+    }
   }
 }
