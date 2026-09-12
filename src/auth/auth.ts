@@ -46,5 +46,12 @@ export async function createAuth(mongoUri?: string) {
       process.env.FRONTEND_URL || 'http://localhost:4200',
       process.env.BETTER_AUTH_URL || 'http://localhost:3000',
     ],
+
+    advanced: {
+      defaultCookieAttributes: {
+        sameSite: 'none',
+        secure: true,
+      },
+    },
   });
 }
