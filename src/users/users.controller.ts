@@ -2,12 +2,11 @@ import { Controller, Get } from '@nestjs/common';
 import { Session } from '@thallesp/nestjs-better-auth';
 import type { UserSession } from '@thallesp/nestjs-better-auth';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { isAdminUser } from '../auth/admin';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  private readonly adminUserId = '6aa4ab58e2368e600b79c460';
-
   @Get('me')
   @ApiOperation({ summary: 'Get the current authenticated user' })
   @ApiResponse({
@@ -29,14 +28,12 @@ export class UsersController {
     },
   })
   getMe(@Session() session: UserSession) {
-    const isAdmin = session.user.id === this.adminUserId;
-
     return {
       user: {
         id: session.user.id,
         name: session.user.name,
         email: session.user.email,
-        isAdmin,
+        isAdmin: isAdminUser(session.user),
       },
     };
   }

@@ -1,7 +1,10 @@
 import { betterAuth } from 'better-auth';
 import { mongodbAdapter } from '@better-auth/mongo-adapter';
+import { APIError, createAuthMiddleware } from 'better-auth/api';
+import { customSession } from 'better-auth/plugins';
 import { MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+import { isAdminUser } from './admin';
 
 export async function createAuth(mongoUri?: string) {
   const resolvedMongoUri = mongoUri || process.env.MONGODB_URI;
@@ -53,5 +56,41 @@ export async function createAuth(mongoUri?: string) {
         secure: true,
       },
     },
+    hooks: {
+      after: createAuthMiddleware(async (ctx) => {
+        const returned = ctx.context.returned;
+
+        if (
+          !returned ||
+          returned instanceof APIError ||
+          returned instanceof Response ||
+          typeof returned !== 'object' ||
+          !('user' in returned) ||
+          !returned.user ||
+          typeof returned.user !== 'object'
+        ) {
+          return;
+        }
+
+        const user = returned.user as { id?: string; email?: string };
+
+        return ctx.json({
+          ...returned,
+          user: {
+            ...user,
+            isAdmin: isAdminUser(user),
+          },
+        });
+      }),
+    },
+    plugins: [
+      customSession(async ({ user, session }) => ({
+        user: {
+          ...user,
+          isAdmin: isAdminUser(user),
+        },
+        session,
+      })),
+    ],
   });
 }

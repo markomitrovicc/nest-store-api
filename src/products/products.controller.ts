@@ -26,14 +26,13 @@ import {
 import { CreateProductDto } from './dto/create-product.dto';
 import { QueryProductDto } from './dto/query-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { isAdminUser } from '../auth/admin';
 import { Product } from './schemas/product.schema';
 import { ProductsService } from './products.service';
 
 @ApiTags('Products')
 @Controller('products')
 export class ProductsController {
-  private readonly adminUserId = '6aa4ab58e2368e600b79c460';
-
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
@@ -119,7 +118,7 @@ export class ProductsController {
   }
 
   private requireAdmin(session: UserSession): void {
-    if (session.user.id !== this.adminUserId) {
+    if (!isAdminUser(session.user)) {
       throw new ForbiddenException('Only admin can manage products');
     }
   }
