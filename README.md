@@ -1,98 +1,120 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Web Shop API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS backend for the **store-frontend** web shop: product catalog, cart, orders, and authentication.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Host
 
-## Description
+Production API:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+**https://nest-store-api-1.onrender.com/**
 
-## Project setup
+- Swagger UI: [https://nest-store-api-1.onrender.com/api](https://nest-store-api-1.onrender.com/api)
+- Auth base: `https://nest-store-api-1.onrender.com/api/auth`
 
-```bash
-$ npm install
-```
+Locally the API listens on `http://localhost:3000` (or `PORT` from `.env`). The frontend (Angular) is expected at `http://localhost:4200` unless `FRONTEND_URL` is set otherwise.
 
-## Compile and run the project
+## What the API does
+
+| Area | Description |
+| --- | --- |
+| Products | Public listing with search, filters, and pagination. Create / update / delete are admin-only. |
+| Auth | Sign-up and sign-in via Better Auth (email + password, cookie session). |
+| User | `GET /users/me` returns the current user and `isAdmin`. |
+| Cart | One cart per authenticated user, with stock checks. |
+| Orders | Checkout from the cart; line items store a snapshot of product name and price. |
+
+Stack: **NestJS 11**, **MongoDB / Mongoose**, **Better Auth**, **Swagger**, **Helmet**, **CORS** (credentials), **rate limit** (60 requests / 60s).
+
+## Getting started
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
+cp .env.example .env
+npm run start:dev
 ```
 
-## Run tests
+Other commands:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run start          # dist build (after nest build)
+npm run start:prod
+npm run build
+npm run lint
+npm run test
+npm run test:e2e
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Seed products (requires `MONGODB_URI`):
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+node scripts/seed-products.js
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Environment
 
-## Resources
+Copy `.env.example` to `.env`:
 
-Check out a few resources that may come in handy when working with NestJS:
+| Variable | Purpose |
+| --- | --- |
+| `MONGODB_URI` | MongoDB connection string. If unset, an in-memory Mongo instance is started (local dev only). |
+| `PORT` | API port (default `3000`). |
+| `BETTER_AUTH_SECRET` | Required secret for sessions. |
+| `BETTER_AUTH_URL` | Public URL of this API (`http://localhost:3000` locally). |
+| `FRONTEND_URL` | Origin of the store-frontend app (CORS + trusted origin). |
+| `ADMIN_USER_ID` | Better Auth user id treated as admin. |
+| `ADMIN_EMAIL` | Email treated as admin (default `admin@gmail.com`). |
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+On the host, `BETTER_AUTH_URL` should be `https://nest-store-api-1.onrender.com`, and `FRONTEND_URL` should be the deployed store-frontend URL.
 
-## Support
+## Authentication
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Auth routes live under `/api/auth` (Better Auth), **not** `/users/register` or `/users/login`.
 
-## Stay in touch
+Typical flow:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1. `POST /api/auth/sign-up/email` — registration
+2. `POST /api/auth/sign-in/email` — login (cookie + `user`, including `isAdmin`)
+3. `GET /api/auth/get-session` — current session
+4. `GET /users/me` — the same user in shop format (`id`, `name`, `email`, `isAdmin`)
 
-## License
+The client must send `credentials: 'include'` (cookies). CORS allows only `FRONTEND_URL`.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+An admin (navbar edit, product CRUD) is a user whose **id** matches `ADMIN_USER_ID` or whose **email** matches `ADMIN_EMAIL`. The `isAdmin` field is included in sign-in, session, and `/users/me` responses.
+
+## Routes
+
+Public (no session):
+
+- `GET /` — health / hello
+- `GET /products` — query: `search`, `category`, `brand`, `minPrice`, `maxPrice`, `page`, `limit`
+- `GET /products/:id`
+
+Session required:
+
+- `GET /users/me`
+- `GET /cart`, `POST /cart/items`, `PATCH /cart/items/:productId`, `DELETE /cart/items/:productId`, `DELETE /cart`
+- `POST /orders`, `GET /orders`, `GET /orders/:id`
+
+Admin only:
+
+- `POST /products`
+- `PATCH /products/:id`
+- `DELETE /products/:id`
+
+Swagger covers the REST routes at `/api`. Auth endpoints are exposed by Better Auth at `/api/auth`.
+
+Example HTTP requests for products are in [`rest-client.http`](rest-client.http).
+
+## Structure
+
+```
+src/
+  auth/          Better Auth + admin check
+  products/      catalog
+  cart/          cart
+  orders/        orders
+  users/         GET /users/me
+  main.ts        bootstrap, CORS, Swagger, Helmet
+scripts/
+  seed-products.js
+```
